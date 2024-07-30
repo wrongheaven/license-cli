@@ -34,7 +34,7 @@ func ShowUsage(command string) {
 	os.Exit(0)
 }
 
-func GetLicencePath(licenseType string) string {
+func GetLicensePath(licenseType string) string {
 	exeDir, err := GetExeDir()
 	PCheck(err)
 
@@ -43,7 +43,7 @@ func GetLicencePath(licenseType string) string {
 }
 
 func OpenTemplate(licenseType string) ([]byte, error) {
-	licensePath := GetLicencePath(licenseType)
+	licensePath := GetLicensePath(licenseType)
 	content, err := os.ReadFile(licensePath)
 	PCheck(err)
 
