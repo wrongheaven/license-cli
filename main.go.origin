@@ -1,0 +1,47 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"wrongheaven/license-cli/utils"
+)
+
+func main() {
+	arglen := len(os.Args)
+
+	if arglen == 1 {
+		utils.ShowUsage("main")
+	}
+
+	switch command := os.Args[1]; command {
+	case "config":
+		fmt.Println("<config not implemented>")
+	case "add":
+		if len(os.Args) == 2 {
+			utils.ShowUsage("add")
+		}
+
+		licenseType := os.Args[2]
+		err := utils.AddLicense(licenseType)
+		if err != nil {
+			panic(err)
+		}
+	case "show":
+		fmt.Println("<show not implemented>")
+	default:
+		utils.ShowUsage("main")
+	}
+}
+
+func dirExists(path string) bool {
+	homeDir, err := os.UserHomeDir()
+	utils.PCheck(err)
+	p := filepath.Join(homeDir, ".license-cli", path)
+	fmt.Println("p:", p)
+
+	asd, err := os.Stat(filepath.Join(homeDir, ".license-cli", path))
+	utils.PCheck(err)
+
+	return asd.IsDir()
+}
