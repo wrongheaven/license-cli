@@ -11,6 +11,12 @@ import (
 	"wrongheaven/license-cli/models"
 )
 
+func PCheck(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
 func IsGoRun() bool {
 	return strings.Contains(os.Args[0], "go-build")
 }
@@ -28,32 +34,35 @@ func ShowUsage(command string) {
 	os.Exit(0)
 }
 
-func GetLicensePath(licenseType string) (string, error) {
-	if IsGoRun() {
-		return filepath.Join("licenses", licenseType+".md"), nil
-	} else {
-		ex, err := os.Executable()
-		if err != nil {
-			return "", err
-		}
-		return filepath.Join(filepath.Dir(ex), "licenses", licenseType+".md"), nil
-	}
+func GetLicencePath(licenseType string) string {
+	exeDir, err := GetExeDir()
+	PCheck(err)
+
+	licenseTypeLower := strings.ToLower(licenseType)
+	return filepath.Join(exeDir, ".license-cli", licenseTypeLower+".md")
+}
+
+func OpenTemplate(licenseType string) ([]byte, error) {
+	licensePath := GetLicencePath(licenseType)
+	content, err := os.ReadFile(licensePath)
+	PCheck(err)
+
+	return content, nil
 }
 
 func GetUserConfig() (models.User, error) {
-	// Open ~/.config/license-cli
-	_, err := os.UserHomeDir()
+	// Open ~/.config/license-cli/user.json
+	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		return models.User{}, err
 	}
-	// configFile, err := os.Open(filepath.Join(userHomeDir, ".config", "license-cli", "user.json"))
-	config, err := os.Open(filepath.Join("config", "user.json"))
+	configFile, err := os.Open(filepath.Join(userHomeDir, ".config", "license-cli", "user.json"))
 	if err != nil {
 		return models.User{}, err
 	}
-	defer config.Close()
+	defer configFile.Close()
 
-	byteValue, err := io.ReadAll(config)
+	byteValue, err := io.ReadAll(configFile)
 	if err != nil {
 		return models.User{}, err
 	}
@@ -65,4 +74,14 @@ func GetUserConfig() (models.User, error) {
 	}
 
 	return user, nil
+}
+
+func GetHomeDir() (string, error) {
+	return os.UserHomeDir()
+}
+func GetExeDir() (string, error) {
+	exe, err := os.Executable()
+	PCheck(err)
+
+	return filepath.Dir(exe), nil
 }
