@@ -1,4 +1,4 @@
-module wrongheaven/license-cli
+module github.com/wrongheaven/license-cli
 
 go 1.22.2
 
